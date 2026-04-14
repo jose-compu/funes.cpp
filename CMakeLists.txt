@@ -25,7 +25,7 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
     include(git-vars)
 
-    set(FUNES_VERSION "0.1.0")
+    set(FUNES_VERSION "0.1.1")
 else()
     set(LLAMA_STANDALONE OFF)
 endif()

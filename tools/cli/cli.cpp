@@ -520,13 +520,19 @@ static bool parse_semantic_memory_args(
             if (!consume_value("--semantic-memory-dim", value)) {
                 return false;
             }
-            out.dim = std::max(0, atoi(value.c_str()));
+            long v = strtol(value.c_str(), nullptr, 10);
+            if (v < 1 || v > 65536) {
+                err = "--semantic-memory-dim must be between 1 and 65536";
+                return false;
+            }
+            out.dim = (int)v;
         } else if (arg == "--semantic-memory-hint-tokens") {
             std::string value;
             if (!consume_value("--semantic-memory-hint-tokens", value)) {
                 return false;
             }
-            out.hint_tokens = std::max(0, atoi(value.c_str()));
+            long v = strtol(value.c_str(), nullptr, 10);
+            out.hint_tokens = (v < 0) ? 0 : (v > 10000) ? 10000 : (int)v;
         } else if (arg == "--semantic-memory-hint-llm-compress") {
             out.hint_llm_compress = true;
         } else if (arg == "--no-semantic-memory-hint-llm-compress") {
@@ -536,13 +542,15 @@ static bool parse_semantic_memory_args(
             if (!consume_value("--semantic-memory-hint-llm-top-k", value)) {
                 return false;
             }
-            out.hint_llm_top_k = std::max(1, atoi(value.c_str()));
+            long v = strtol(value.c_str(), nullptr, 10);
+            out.hint_llm_top_k = (v < 1) ? 1 : (v > 100) ? 100 : (int)v;
         } else if (arg == "--semantic-memory-hint-llm-n-predict") {
             std::string value;
             if (!consume_value("--semantic-memory-hint-llm-n-predict", value)) {
                 return false;
             }
-            out.hint_llm_n_predict = std::max(8, atoi(value.c_str()));
+            long v = strtol(value.c_str(), nullptr, 10);
+            out.hint_llm_n_predict = (v < 8) ? 8 : (v > 1024) ? 1024 : (int)v;
         } else if (arg == "--semantic-memory-teach-open-tag") {
             if (!consume_value("--semantic-memory-teach-open-tag", out.teach_open_tag)) {
                 return false;

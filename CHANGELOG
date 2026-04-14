@@ -1,6 +1,13 @@
 funes.cpp change log
 ====================
 
+0.1.1  (2025-06-25)
+-------------------
+
+  * Replace atoi with strtol + range validation for all --semantic-memory-* numeric flags.
+  * Document all CLI flags in SPECS.md (11 previously undocumented flags added).
+  * Add LFM (Liquid AI) to supported architecture list.
+
 0.1.0  (2025-06-25)
 -------------------
 
