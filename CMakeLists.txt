@@ -25,8 +25,7 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
     include(git-vars)
 
-    # configure project version
-    # TODO
+    set(FUNES_VERSION "0.1.0")
 else()
     set(LLAMA_STANDALONE OFF)
 endif()
@@ -127,7 +126,7 @@ endif()
 if (NOT DEFINED LLAMA_BUILD_COMMIT)
     set(LLAMA_BUILD_COMMIT        ${BUILD_COMMIT})
 endif()
-set(LLAMA_INSTALL_VERSION 0.0.${LLAMA_BUILD_NUMBER})
+set(LLAMA_INSTALL_VERSION ${FUNES_VERSION})
 
 # override ggml options
 set(GGML_ALL_WARNINGS   ${LLAMA_ALL_WARNINGS})
@@ -185,6 +184,17 @@ if (NOT TARGET ggml AND NOT LLAMA_USE_SYSTEM_GGML)
     add_subdirectory(ggml)
     # ... otherwise assume ggml is added by a parent CMakeLists.txt
 endif()
+
+# LogosDB — semantic vector database for memory retrieval
+include(FetchContent)
+FetchContent_Declare(logosdb
+    GIT_REPOSITORY https://github.com/jose-compu/logosdb.git
+    GIT_TAG        v0.1.0
+)
+set(BUILD_SHARED_LIBS_SAVED ${BUILD_SHARED_LIBS})
+set(BUILD_SHARED_LIBS OFF)
+FetchContent_MakeAvailable(logosdb)
+set(BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS_SAVED})
 
 #
 # build the library

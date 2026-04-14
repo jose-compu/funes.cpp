@@ -511,6 +511,7 @@ public:
     std::map<llama_seq_id, llama_sampler *> samplers;
 };
 
+
 //
 // llm_graph_result
 //
@@ -865,7 +866,6 @@ struct llm_graph_context {
     ggml_tensor * build_inp_out_ids() const;
     ggml_tensor * build_inp_mean() const;
     ggml_tensor * build_inp_cls() const;
-
     ggml_tensor * build_inp_cross_embd() const;
     ggml_tensor * build_inp_pos_bucket_enc() const;
     ggml_tensor * build_inp_pos_bucket_dec() const;

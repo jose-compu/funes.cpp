@@ -8761,6 +8761,21 @@ llama_memory_i * llama_model::create_memory(const llama_memory_params & params, 
 ggml_cgraph * llama_model::build_graph(const llm_graph_params & params) const {
     std::unique_ptr<llm_graph_context> llm;
 
+#ifdef LLAMA_LFM2_ONLY
+    switch (arch) {
+        case LLM_ARCH_LFM2:
+        case LLM_ARCH_LFM2MOE:
+            {
+                if (hparams.swa_type == LLAMA_SWA_TYPE_STANDARD) {
+                    llm = std::make_unique<llm_build_lfm2<true>>(*this, params);
+                } else {
+                    llm = std::make_unique<llm_build_lfm2<false>>(*this, params);
+                }
+            } break;
+        default:
+            throw std::runtime_error("LLAMA_LFM2_ONLY build supports only LFM2/LFM2MOE architectures");
+    }
+#else
     switch (arch) {
         case LLM_ARCH_LLAMA:
             {
@@ -9265,6 +9280,7 @@ ggml_cgraph * llama_model::build_graph(const llm_graph_params & params) const {
         default:
             GGML_ABORT("fatal error");
     }
+#endif
 
     // add on pooling layer
     llm->build_pooling(cls, cls_b, cls_out, cls_out_b, cls_norm);

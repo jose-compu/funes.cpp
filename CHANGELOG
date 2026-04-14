@@ -1,0 +1,21 @@
+funes.cpp change log
+====================
+
+0.1.0  (2025-06-25)
+-------------------
+
+  Initial release.
+
+  * Semantic memory via context-window injection (Quote/Hint).
+  * LogosDB v0.1.0 as storage backend (HNSW search, mmap vectors, JSONL metadata).
+  * Dual injection: LLM compressor chooses Quote (literal) or Hint (summary).
+  * Heuristic keyword hint fallback when LLM compress is off.
+  * Temporal context: pre-computed date arithmetic injected into compressor prompt.
+  * Teach via /teach command, <teach> tags, teach prefix, and learn-from-response.
+  * Teach variants (paraphrase generation) for robust recall.
+  * Model-agnostic: works with all 100+ architectures supported by llama.cpp.
+  * Tested with LLaMA, Qwen, Gemma, Phi, Mistral, DeepSeek, Command-R,
+    GPT-2/NeoX, Falcon, LFM (Liquid), and Mamba families.
+  * Removed experimental latent hidden-state injection (no benchmark lift).
+  * Removed logit-bias injection path.
+  * Single executable (llama-cli) with LogosDB statically linked.

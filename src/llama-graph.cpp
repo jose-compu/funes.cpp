@@ -11,10 +11,16 @@
 #include "llama-memory-recurrent.h"
 
 #include <cassert>
+#include <cinttypes>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <mutex>
 #include <numeric>
 #include <sstream>
+#include <string>
 #include <unordered_set>
 
 // dedup helpers
@@ -782,6 +788,7 @@ bool llm_graph_input_sampling::can_reuse(const llm_graph_params & params) {
 
     return true;
 }
+
 
 //
 // llm_graph_result
