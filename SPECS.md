@@ -110,6 +110,10 @@ in memory chunks and the query. This avoids LLM date-math errors.
 
 ## Dependencies
 
-- **LogosDB v0.1.0** — fetched via CMake FetchContent from
+- **LogosDB v0.3.2** — fetched via CMake FetchContent from
   [github.com/jose-compu/logosdb](https://github.com/jose-compu/logosdb)
+  - Cross-platform support: Windows, Linux, macOS
+  - Batch put API for bulk ingestion (~4× faster)
+  - Delete and update operations
+  - Soft-delete with live/dead row tracking
 - **llama.cpp** — forked in-tree with ggml backend
