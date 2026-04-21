@@ -1,20 +1,13 @@
 funes.cpp change log
 ====================
 
-0.2.1  (2026-04-21)
--------------------
-
-  * Fix Windows build: disable LogosDB on Windows due to POSIX mmap dependency.
-    - LogosDB requires sys/mman.h which is not available on Windows
-    - Semantic memory features are disabled on Windows builds
-    - Windows users can still use llama-cli without semantic memory
-
 0.2.0  (2026-04-21)
 -------------------
 
-  * Bump LogosDB to v0.3.0 for batch put API and improved performance.
+  * Bump LogosDB to v0.3.2 for cross-platform support (Windows, Linux, macOS).
+    - Windows support via platform-compatible memory mapping
     - Batch put: ~4× faster for bulk ingestion (30K vectors/sec vs 7.5K)
-    - Delete/update operations from v0.2.0 now available
+    - Delete/update operations available
     - New APIs: logosdb_put_batch(), logosdb_delete(), logosdb_update()
 
 0.1.1  (2025-06-25)
