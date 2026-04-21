@@ -193,7 +193,7 @@ def main() -> None:
 
         results: list[ABResult] = []
         for case in cases:
-            extra_args: list[str] = []
+            extra_args: list[str] | None = []
             if args.teach_variants:
                 extra_args.append("--semantic-memory-teach-variants")
             if args.hint_tokens > 0:

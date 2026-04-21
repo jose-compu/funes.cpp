@@ -41,7 +41,7 @@ class PersistentMemory:
     def __init__(self, db_path: Path, enabled: bool = True):
         self.db_path = db_path
         self.enabled = enabled
-        self.state = {
+        self.state: dict[str, dict[str, Any] | list[Any]] = {
             "facts": {},
             "sets": {},
             "events": [],
@@ -63,60 +63,88 @@ class PersistentMemory:
         with self.db_path.open("w", encoding="utf-8") as f:
             json.dump(self.state, f, indent=2)
 
+    def _get_facts(self) -> dict[str, Any]:
+        facts = self.state.get("facts")
+        if isinstance(facts, dict):
+            return facts
+        return {}
+
+    def _get_sets(self) -> dict[str, list[str]]:
+        sets = self.state.get("sets")
+        if isinstance(sets, dict):
+            return sets
+        return {}
+
+    def _get_events(self) -> list[dict[str, Any]]:
+        events = self.state.get("events")
+        if isinstance(events, list):
+            return events
+        return []
+
     def set_fact(self, key: str, value: Any) -> None:
         if not self.enabled:
             return
-        self.state["facts"][key] = value
+        facts = self._get_facts()
+        facts[key] = value
+        self.state["facts"] = facts
         self.save()
 
     def get_fact(self, key: str) -> Any | None:
         if not self.enabled:
             return None
-        return self.state["facts"].get(key)
+        return self._get_facts().get(key)
 
     def add_set_item(self, set_key: str, value: str) -> None:
         if not self.enabled:
             return
-        current = set(self.state["sets"].get(set_key, []))
+        sets = self._get_sets()
+        current = set(sets.get(set_key, []))
         current.add(value)
-        self.state["sets"][set_key] = sorted(current)
+        sets[set_key] = sorted(current)
+        self.state["sets"] = sets
         self.save()
 
     def remove_set_item(self, set_key: str, value: str) -> None:
         if not self.enabled:
             return
-        current = set(self.state["sets"].get(set_key, []))
+        sets = self._get_sets()
+        current = set(sets.get(set_key, []))
         current.discard(value)
-        self.state["sets"][set_key] = sorted(current)
+        sets[set_key] = sorted(current)
+        self.state["sets"] = sets
         self.save()
 
     def get_set(self, set_key: str) -> list[str]:
         if not self.enabled:
             return []
-        return self.state["sets"].get(set_key, [])
+        return self._get_sets().get(set_key, [])
 
     def add_event(self, event_type: str, when: str, metadata: dict[str, Any]) -> None:
         if not self.enabled:
             return
-        self.state["events"].append(
+        events = self._get_events()
+        events.append(
             {
                 "event_type": event_type,
                 "when": when,
                 "metadata": metadata,
             }
         )
+        self.state["events"] = events
         self.save()
 
     def latest_event(self, event_type: str, metadata_filter: dict[str, Any] | None = None) -> dict[str, Any] | None:
         if not self.enabled:
             return None
         metadata_filter = metadata_filter or {}
-        for event in reversed(self.state["events"]):
-            if event["event_type"] != event_type:
+        for event in reversed(self._get_events()):
+            evt_type = event.get("event_type")
+            if evt_type != event_type:
                 continue
-            metadata = event.get("metadata", {})
-            if all(metadata.get(k) == v for k, v in metadata_filter.items()):
-                return event
+            metadata = event.get("metadata")
+            if isinstance(metadata, dict):
+                if all(metadata.get(k) == v for k, v in metadata_filter.items()):
+                    return event
         return None
 
 
