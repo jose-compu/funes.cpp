@@ -186,15 +186,23 @@ if (NOT TARGET ggml AND NOT LLAMA_USE_SYSTEM_GGML)
 endif()
 
 # LogosDB — semantic vector database for memory retrieval
-include(FetchContent)
-FetchContent_Declare(logosdb
-    GIT_REPOSITORY https://github.com/jose-compu/logosdb.git
-    GIT_TAG        v0.3.0
-)
-set(BUILD_SHARED_LIBS_SAVED ${BUILD_SHARED_LIBS})
-set(BUILD_SHARED_LIBS OFF)
-FetchContent_MakeAvailable(logosdb)
-set(BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS_SAVED})
+# Note: LogosDB uses POSIX mmap which is not available on Windows.
+# Disable on Windows until cross-platform storage is implemented.
+if (NOT WIN32)
+    include(FetchContent)
+    FetchContent_Declare(logosdb
+        GIT_REPOSITORY https://github.com/jose-compu/logosdb.git
+        GIT_TAG        v0.3.0
+    )
+    set(BUILD_SHARED_LIBS_SAVED ${BUILD_SHARED_LIBS})
+    set(BUILD_SHARED_LIBS OFF)
+    FetchContent_MakeAvailable(logosdb)
+    set(BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS_SAVED})
+    set(LLAMA_LOGOSDB_AVAILABLE ON)
+else()
+    message(WARNING "LogosDB is not available on Windows. Semantic memory features disabled.")
+    set(LLAMA_LOGOSDB_AVAILABLE OFF)
+endif()
 
 #
 # build the library

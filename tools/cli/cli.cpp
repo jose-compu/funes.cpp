@@ -25,7 +25,10 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <cstdlib>
+
+#ifdef LLAMA_LOGOSDB_AVAILABLE
 #include <logosdb/logosdb.h>
+#endif
 
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -961,10 +964,18 @@ int main(int argc, char ** argv) {
         return 1;
     }
 
+#ifdef LLAMA_LOGOSDB_AVAILABLE
     logosdb_t * mem_db = nullptr;
     auto mem_db_close = [&]() {
         if (mem_db) { logosdb_close(mem_db); mem_db = nullptr; }
     };
+#else
+    (void)semantic_arg_err; // unused when LogosDB unavailable
+    if (!semantic_opts.db_path.empty()) {
+        console::error("--semantic-memory-db is not available on Windows\n");
+        return 1;
+    }
+#endif
 
     // TODO: maybe support it later?
     if (params.conversation_mode == COMMON_CONVERSATION_MODE_DISABLED) {
@@ -1010,6 +1021,7 @@ int main(int argc, char ** argv) {
     console::spinner::stop();
     console::log("\n");
 
+#ifdef LLAMA_LOGOSDB_AVAILABLE
     if (!semantic_opts.db_path.empty()) {
         if (semantic_opts.dim <= 0) {
             console::error("--semantic-memory-dim is required when using --semantic-memory-db\n");
@@ -1028,6 +1040,7 @@ int main(int argc, char ** argv) {
         console::log("semantic memory db: %s (dim=%d, %zu rows)\n",
             semantic_opts.db_path.c_str(), semantic_opts.dim, logosdb_count(mem_db));
     }
+#endif
 
     std::thread inference_thread([&ctx_cli]() {
         ctx_cli.ctx_server.start_loop();
@@ -1065,7 +1078,9 @@ int main(int argc, char ** argv) {
     console::log("  /exit or Ctrl+C     stop or exit\n");
     console::log("  /regen              regenerate the last response\n");
     console::log("  /clear              clear the chat history\n");
+#ifdef LLAMA_LOGOSDB_AVAILABLE
     console::log("  /teach <text>       add external memory embedding only\n");
+#endif
     console::log("  /read <file>        add a text file\n");
     console::log("  /glob <pattern>     add text files using globbing pattern\n");
     if (inf.has_inp_image) {
@@ -1075,6 +1090,7 @@ int main(int argc, char ** argv) {
         console::log("  /audio <file>       add an audio file\n");
     }
     console::log("\n");
+#ifdef LLAMA_LOGOSDB_AVAILABLE
     if (mem_db) {
         if (semantic_opts.enable_teach_tags) {
             console::log("teach tags enabled: %s ... %s\n", semantic_opts.teach_open_tag.c_str(), semantic_opts.teach_close_tag.c_str());
@@ -1099,6 +1115,7 @@ int main(int argc, char ** argv) {
         }
         console::log("\n");
     }
+#endif
 
     // interactive loop
     std::string cur_msg;
@@ -1178,6 +1195,7 @@ int main(int argc, char ** argv) {
         if (string_starts_with(buffer, "/exit")) {
             break;
         } else if (string_starts_with(buffer, "/teach ")) {
+#ifdef LLAMA_LOGOSDB_AVAILABLE
             if (!mem_db) {
                 console::error("semantic memory is disabled. use --semantic-memory-db <path> --semantic-memory-dim <D>\n");
                 continue;
@@ -1210,6 +1228,10 @@ int main(int argc, char ** argv) {
             }
             console::log("taught %zu memory row(s)\n", taught);
             continue;
+#else
+            console::error("semantic memory is not available on Windows\n");
+            continue;
+#endif
         } else if (string_starts_with(buffer, "/regen")) {
             if (ctx_cli.messages.size() >= 2) {
                 size_t last_idx = ctx_cli.messages.size() - 1;
@@ -1298,6 +1320,7 @@ int main(int argc, char ** argv) {
             continue;
         } else {
             // not a command
+#ifdef LLAMA_LOGOSDB_AVAILABLE
             if (mem_db) {
                 std::vector<std::string> teach_items;
                 std::string stripped = buffer;
@@ -1415,6 +1438,7 @@ int main(int argc, char ** argv) {
                     }
                 }
             }
+#endif  // LLAMA_LOGOSDB_AVAILABLE
 
             cur_msg += buffer;
         }
@@ -1434,6 +1458,7 @@ int main(int argc, char ** argv) {
             {"content", assistant_content}
         });
 
+#ifdef LLAMA_LOGOSDB_AVAILABLE
         if (mem_db && !learn_from_response_prompts.empty()) {
             size_t taught_from_response = 0;
             for (const auto & prompt : learn_from_response_prompts) {
@@ -1469,6 +1494,7 @@ int main(int argc, char ** argv) {
                 console::log("learned %zu memory row(s) from assistant response\n", taught_from_response);
             }
         }
+#endif
         console::log("\n");
 
         if (params.show_timings) {
@@ -1486,7 +1512,9 @@ int main(int argc, char ** argv) {
     console::set_display(DISPLAY_TYPE_RESET);
 
     console::log("\nExiting...\n");
+#ifdef LLAMA_LOGOSDB_AVAILABLE
     mem_db_close();
+#endif
     ctx_cli.ctx_server.terminate();
     inference_thread.join();
 
