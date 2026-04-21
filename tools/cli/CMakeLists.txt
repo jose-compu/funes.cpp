@@ -1,6 +1,11 @@
 set(TARGET llama-cli)
 add_executable(${TARGET} cli.cpp)
-target_link_libraries(${TARGET} PRIVATE server-context logosdb PUBLIC common ${CMAKE_THREAD_LIBS_INIT})
+if(LLAMA_LOGOSDB_AVAILABLE)
+    target_link_libraries(${TARGET} PRIVATE server-context logosdb PUBLIC common ${CMAKE_THREAD_LIBS_INIT})
+    target_compile_definitions(${TARGET} PRIVATE LLAMA_LOGOSDB_AVAILABLE)
+else()
+    target_link_libraries(${TARGET} PRIVATE server-context PUBLIC common ${CMAKE_THREAD_LIBS_INIT})
+endif()
 target_compile_features(${TARGET} PRIVATE cxx_std_17)
 
 include_directories(../server)

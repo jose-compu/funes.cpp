@@ -1,6 +1,14 @@
 funes.cpp change log
 ====================
 
+0.2.1  (2026-04-21)
+-------------------
+
+  * Fix Windows build: disable LogosDB on Windows due to POSIX mmap dependency.
+    - LogosDB requires sys/mman.h which is not available on Windows
+    - Semantic memory features are disabled on Windows builds
+    - Windows users can still use llama-cli without semantic memory
+
 0.2.0  (2026-04-21)
 -------------------
 
