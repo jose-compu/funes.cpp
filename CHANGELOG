@@ -1,6 +1,14 @@
 funes.cpp change log
 ====================
 
+0.2.0  (2026-04-21)
+-------------------
+
+  * Bump LogosDB to v0.3.0 for batch put API and improved performance.
+    - Batch put: ~4× faster for bulk ingestion (30K vectors/sec vs 7.5K)
+    - Delete/update operations from v0.2.0 now available
+    - New APIs: logosdb_put_batch(), logosdb_delete(), logosdb_update()
+
 0.1.1  (2025-06-25)
 -------------------
 

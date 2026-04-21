@@ -25,7 +25,7 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
     include(git-vars)
 
-    set(FUNES_VERSION "0.1.1")
+    set(FUNES_VERSION "0.2.0")
 else()
     set(LLAMA_STANDALONE OFF)
 endif()
@@ -189,7 +189,7 @@ endif()
 include(FetchContent)
 FetchContent_Declare(logosdb
     GIT_REPOSITORY https://github.com/jose-compu/logosdb.git
-    GIT_TAG        v0.1.0
+    GIT_TAG        v0.3.0
 )
 set(BUILD_SHARED_LIBS_SAVED ${BUILD_SHARED_LIBS})
 set(BUILD_SHARED_LIBS OFF)
