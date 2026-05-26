@@ -2,8 +2,9 @@ name: Update Winget Package
 
 on:
   workflow_dispatch: # allows manual triggering
-  schedule:
-    - cron: '28 5 * * *' # Update every day at 5:28 UTC
+  # schedule disabled — daily winget updates not needed for funes.cpp fork
+  # schedule:
+  #   - cron: '28 5 * * *'
 
 jobs:
   update:
